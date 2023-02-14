@@ -3,6 +3,7 @@ package com.jarvis.wordcount;
 import com.jarvis.wordcount.functions.MyFlatMapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /*
@@ -14,19 +15,18 @@ public class WordCountBatchJob {
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-        DataSet<String> wordsSource = env
+        DataSource<String> wordsSource = env
                 .readTextFile("data/words.txt")
                 .name("source");
 
-        DataSet<Tuple2<String, Integer>> wordCountStream = wordsSource
+        wordsSource
                 .flatMap(new MyFlatMapFunction())
                 .groupBy(0)
                 .sum(1)
-                .name("transform to word count");
+                .name("transform to word count").print();
 
-        wordCountStream.print();
 
-        env.execute("Flink Word Count Batch");
+        //env.execute("Flink Word Count Batch");
 
     }
 }
